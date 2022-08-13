@@ -125,7 +125,8 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalOptions>/permissive %(AdditionalOptions)</AdditionalOptions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -160,6 +161,7 @@
   <ItemGroup>
     <ClInclude Include="banapass.h" />
     <ClInclude Include="log.h" />
+    <ClInclude Include="random.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="banapass.cpp" />

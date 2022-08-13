@@ -6,6 +6,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <iostream>
 
 void log(const char* format, ...)
 {
@@ -16,5 +17,6 @@ void log(const char* format, ...)
 	strcat(fmt, format);
 	vsprintf(buffer, fmt, args);
 	OutputDebugStringA(buffer);
+	std::cout << buffer << std::endl;
 	va_end(args);
 }

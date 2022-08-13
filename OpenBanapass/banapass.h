@@ -7,8 +7,8 @@
 extern "C"
 {
 
-	BANA_API ULONGLONG BngRwAttach(UINT, char*, int, int, void*, long);
-	BANA_API int BngRwDevReset(UINT, ULONGLONG, ULONGLONG);
+	BANA_API ULONGLONG BngRwAttach(UINT, char*, int, int, long (*callback)(long, long, long*), long*);
+	BANA_API int BngRwDevReset(UINT, void (*callback)(int, int, long*), long*);
 	BANA_API ULONGLONG BngRwExReadMifareAllBlock();
 	BANA_API void BngRwFin();
 	BANA_API UINT BngRwGetFwVersion(UINT);
@@ -27,7 +27,7 @@ extern "C"
 	BANA_API int BngRwReqLed(UINT, UINT, ULONGLONG, ULONGLONG);
 	BANA_API int BngRwReqSendMailTo(UINT, int, UINT, int*, char*, char*, char*, char*, ULONGLONG, ULONGLONG);
 	BANA_API int BngRwReqSendUrlTo(UINT, int, UINT, int*, char*, char*, ULONGLONG, ULONGLONG);
-	BANA_API int BngRwReqWaitTouch(UINT a, int maxIntSomehow, UINT c, void (*callback)(int, int, void*, void*), void* e);
+	BANA_API int BngRwReqWaitTouch(UINT a, int maxIntSomehow, UINT c, void (*callback)(int, int, void*, void*), void* card_struct_ptr);
 	BANA_API ULONGLONG BngRwReqSetLedPower();
 
 }
