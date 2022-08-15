@@ -61,11 +61,14 @@ void StartThread(long (*callback)(long, long, long*), long someLong, long readSt
     callback(someLong, readStatus, someStructPtr);
 }
 
-void StartThread1(void (*callback)(int, int, void*, void*), int a, int readerStatus, void* rawCardData, void* cardStuctPtr) {
+void StartThread1(void (*callback)(int, int, void*, void*), int a, int readerStatus,
+    unsigned char* rawCardData, void* cardStuctPtr) {
     using namespace std::chrono_literals;
     std::this_thread::sleep_for(250ms);
 
     callback(a, readerStatus, rawCardData, cardStuctPtr);
+
+    delete rawCardData;
 }
 
 extern "C" {
@@ -226,7 +229,7 @@ int BngRwReqWaitTouch(UINT a, int maxIntSomehow, UINT c, void (*callback)(int, i
     if (GetAsyncKeyState('P'))
     {
         // Raw card data and some other stuff, who cares
-        unsigned char rawCardData[168] = {
+        auto* rawCardData = new unsigned char[168] {
             0x01, 0x01, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x92, 0x2E, 0x58, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x7F, 0x5C, 0x97, 0x44, 0xF0, 0x88, 0x04, 0x00,
@@ -242,6 +245,7 @@ int BngRwReqWaitTouch(UINT a, int maxIntSomehow, UINT c, void (*callback)(int, i
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
+        
 
         std::string accessCode = getProfileString("card", "accessCode", "30764352518498791337", ".\\card.ini");
         std::string chipId = getProfileString("card", "chipId", "7F5C9744F111111143262C3300040610", ".\\card.ini");
