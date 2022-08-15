@@ -1,5 +1,5 @@
 # OpenBanapass
-An open-source Banapassport API DLL replacement for Wangan Midnight Maximum Tune 6.
+An open-source Banapassport API DLL replacement for Taiko
 
 ## Notes
 This project is part of [Project Asakura](https://github.com/ProjectAsakura), a network reimplementation project for Maximum Tune 6.
