@@ -8,7 +8,7 @@ extern "C"
 {
 
 	BANA_API ULONGLONG BngRwAttach(UINT, char*, int, int, long (*callback)(long, long, long*), long*);
-	BANA_API int BngRwDevReset(UINT, void (*callback)(int, int, long*), long*);
+	BANA_API int BngRwDevReset(UINT, long (*callback)(int, int, long*), long*);
 	BANA_API ULONGLONG BngRwExReadMifareAllBlock();
 	BANA_API void BngRwFin();
 	BANA_API UINT BngRwGetFwVersion(UINT);
@@ -17,7 +17,7 @@ extern "C"
 	BANA_API const char* BngRwGetVersion();
 	BANA_API long BngRwInit();
 	BANA_API ULONGLONG BngRwIsCmdExec(UINT);
-	BANA_API int BngRwReqAction(UINT, UINT, ULONGLONG, ULONGLONG);
+	BANA_API int BngRwReqAction(UINT, UINT, void (*callback)(long, int, long*), long* some_struct_ptr);
 	BANA_API int BngRwReqAiccAuth(UINT, int, UINT, int*, ULONGLONG, ULONGLONG, ULONGLONG*);
 	BANA_API int BngRwReqBeep(UINT, UINT, ULONGLONG, ULONGLONG);
 	BANA_API int BngRwReqCancel(UINT);
