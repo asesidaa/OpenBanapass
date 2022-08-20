@@ -140,6 +140,7 @@ ULONGLONG BngRwReqSetLedPower() {
 
 int BngRwDevReset(UINT a, long (*callback)(int, int, long*), long* some_struct_ptr) {
     log("BngRwDevReset(%i, %p, %p)\n", a, callback, some_struct_ptr);
+    readerActive = false;
 
     std::thread t(StartResetThread, callback, some_struct_ptr);
     t.detach();
