@@ -58,7 +58,7 @@ void createCard() {
 void StartAttachThread(long (*callback)(long, long, long*), long* someStructPtr) {
     // this is a really ugly hack, forgive me
     using namespace std::chrono_literals;
-    std::this_thread::sleep_for(250ms);
+    std::this_thread::sleep_for(100ms);
 
     callback(0, 0, someStructPtr);
 }
@@ -66,7 +66,7 @@ void StartAttachThread(long (*callback)(long, long, long*), long* someStructPtr)
 void StartResetThread(long (*callback)(int, int, long*), long* someStructPtr) {
     // this is a really ugly hack, forgive me
     using namespace std::chrono_literals;
-    std::this_thread::sleep_for(250ms);
+    std::this_thread::sleep_for(100ms);
 
     callback(0, 0, someStructPtr);
 }
@@ -74,7 +74,7 @@ void StartResetThread(long (*callback)(int, int, long*), long* someStructPtr) {
 void StartReqActionThread(void (*callback)(long, int, long*), long* someStructPtr) {
     // this is a really ugly hack, forgive me
     using namespace std::chrono_literals;
-    std::this_thread::sleep_for(250ms);
+    std::this_thread::sleep_for(100ms);
 
     callback(0, 0, someStructPtr);
 }
@@ -112,6 +112,36 @@ void StartReadThread(void (*callback)(int, int, void*, void*), void* cardStuctPt
             memcpy(rawCardData + 0x50, accessCode.c_str(), accessCode.size() + 1);
             memcpy(rawCardData + 0x2C, chipId.c_str(), chipId.size() + 1);
 
+            log("Callback from read card");
+            callback(0, 0, rawCardData, cardStuctPtr);
+        }
+        if (GetAsyncKeyState('Q'))
+        {
+            // Raw card data and some other stuff, who cares
+            unsigned char rawCardData[168] = {
+                0x01, 0x01, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x92, 0x2E, 0x58, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x7F, 0x5C, 0x97, 0x44, 0xF0, 0x88, 0x04, 0x00,
+                0x43, 0x26, 0x2C, 0x33, 0x00, 0x04, 0x06, 0x10, 0x30, 0x30, 0x30, 0x30,
+                0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
+                0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
+                0x30, 0x30, 0x30, 0x30, 0x00, 0x00, 0x00, 0x00, 0x30, 0x30, 0x30, 0x30,
+                0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
+                0x30, 0x30, 0x30, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
+                0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x4E, 0x42, 0x47, 0x49, 0x43, 0x36, 0x00, 0x00, 0xFA, 0xE9, 0x69, 0x00,
+                0xF6, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+            };
+
+
+            const std::string accessCode = "30764352518498791338";
+            const std::string chipId = "7F5C9744F111111143262C3300040610";
+            
+            memcpy(rawCardData + 0x50, accessCode.c_str(), accessCode.size() + 1);
+            memcpy(rawCardData + 0x2C, chipId.c_str(), chipId.size() + 1);
+
             callback(0, 0, rawCardData, cardStuctPtr);
         }
     }
@@ -140,7 +170,6 @@ ULONGLONG BngRwReqSetLedPower() {
 
 int BngRwDevReset(UINT a, long (*callback)(int, int, long*), long* some_struct_ptr) {
     log("BngRwDevReset(%i, %p, %p)\n", a, callback, some_struct_ptr);
-    readerActive = false;
 
     std::thread t(StartResetThread, callback, some_struct_ptr);
     t.detach();
@@ -192,7 +221,11 @@ int BngRwReqAction(UINT a, UINT b, void (*callback)(long, int, long*), long* som
 
     std::thread t(StartReqActionThread, callback, some_struct_ptr);
     t.detach();
-    return 1;
+    if (b == 0)
+    {
+        return 1;
+    }
+    return -1;
 }
 
 int BngRwReqAiccAuth(UINT a, int b, UINT c, int* d, ULONGLONG e, ULONGLONG f, ULONGLONG* g) {
@@ -207,7 +240,6 @@ int BngRwReqBeep(UINT a, UINT b, ULONGLONG c, ULONGLONG d) {
 
 int BngRwReqCancel(UINT a) {
     log("BngRwReqCancel(%i)\n", a);
-    readerActive = false;
     if (7 < a)
     {
         return -100;
@@ -265,6 +297,11 @@ int BngRwReqSendUrlTo(UINT a, int b, UINT c, int* d,
 int BngRwReqWaitTouch(UINT a, int maxIntSomehow, UINT c, void (*callback)(int, int, void*, void*), void* card_struct_ptr) {
     log("BngRwReqWaitTouch(%i, %d, %i, %p, %p)\n", a, maxIntSomehow, c, callback, card_struct_ptr);
 
+    // Hack to make sure previous threads have exited
+    readerActive = false;
+    using namespace std::chrono_literals;
+    std::this_thread::sleep_for(250ms);
+    
     readerActive = true;
 
     std::thread t(StartReadThread, callback, card_struct_ptr);
